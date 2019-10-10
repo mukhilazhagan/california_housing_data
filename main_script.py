@@ -121,7 +121,58 @@ print("Original Random Split:" )
 print( test_set_sk["income_cat"].value_counts()/ len(test_set_sk) )
 
 
+housing_vis = strat_train_set
+
+housing_vis.plot(kind = 'scatter', x='longitude', y='latitude')
+
+housing_vis.plot(kind = 'scatter', x='longitude', y='latitude', alpha=0.1)
+
+housing_vis.plot(kind = 'scatter', x='longitude', y='latitude', alpha=0.4, s = housing['population']/100, label='population',
+                 figsize=(10,7), c='median_house_value', cmap= plt.get_cmap('jet'), colorbar=True)
 
 
+'''
+Finding Correlation between every pair of attributes
+
+In statistics, the Pearson correlation coefficient (PCC, pronounced /ˈpɪərsən/), also referred to as Pearson's r, 
+the Pearson product-moment correlation coefficient (PPMCC) or the bivariate correlation,[1] is a measure of the 
+linear correlation between two variables X and Y. According to the Cauchy–Schwarz inequality it has a value between +1 and −1,
+ where 1 is total positive linear correlation, 0 is no linear correlation, and −1 is total negative linear correlation.
+
+'''
+
+corr_matrix = housing_vis.corr()
+print(corr_matrix['median_house_value'].sort_values(ascending=False))
+
+#plt.matshow(corr_matrix)
+#plt.show()
+
+def plot_corr(df,size=10):
+    '''Function plots a graphical correlation matrix for each pair of columns in the dataframe.
+
+    Input:
+        df: pandas DataFrame
+        size: vertical and horizontal size of the plot'''
+
+    corr = df.corr()
+    fig, ax = plt.subplots(figsize=(size, size))
+    ax.matshow(corr)
+    plt.xticks(range(len(corr.columns)), corr.columns);
+    plt.yticks(range(len(corr.columns)), corr.columns);
+
+plot_corr(housing_vis)
 
 
+'''
+Another way to check for correlation between attributes is to use Pandas’
+scatter_matrix function, which plots every numerical attribute against every other
+numerical attribute. Since there are now 11 numerical attributes, you would get 112
+ =
+121 plots, which would not fit on a page, so let’s just focus on a few promising
+attributes that seem most correlated with the median housing value
+'''
+
+from pandas.plotting import scatter_matrix
+
+attributes = ["median_house_value", "median_income", "total_rooms", "housing_median_age"]
+scatter_matrix ( housing_vis[attributes] , figsize=(12,8) )
