@@ -176,3 +176,68 @@ from pandas.plotting import scatter_matrix
 
 attributes = ["median_house_value", "median_income", "total_rooms", "housing_median_age"]
 scatter_matrix ( housing_vis[attributes] , figsize=(12,8) )
+
+housing_vis.plot(kind= 'scatter', x='median_income',y= 'median_house_value', alpha=0.1)
+
+
+
+
+
+housing_vis["rooms_per_household"] = housing_vis["total_rooms"]/housing_vis["households"]
+housing["bedrooms_per_room"] = housing["total_bedrooms"]/housing["total_rooms"]
+housing["population_per_household"]=housing["population"]/housing["households"]
+
+corr_matrix = housing_vis.corr()
+print(corr_matrix['median_house_value'].sort_values(ascending=False))
+
+
+''' 
+Machine Learning
+
+making data readdy for ML
+'''
+## Preparing for Transformations
+
+
+housing = strat_train_set.drop("median_house_value", axis =1)
+housing_labels = strat_train_set["median_house_value"].copy()
+# drop creates a copy and does not modify the original set
+
+# Total bedrooms has missing values
+#1- Get rid of the corresponding districts.
+#2 -Get rid of the whole attribute.
+#3 -Set the values to some value (zero, the mean, the median, etc.)
+
+#housing.dropna(subset=["total_bedrooms"]) # option 1
+#housing.drop("total_bedrooms", axis=1) # option 2
+
+median = housing["total_bedrooms"].median() # option 3
+housing["total_bedrooms"].fillna(median, inplace=True)
+
+
+# Simple imputer can learn and fill NA, 
+# But only works on numerical values
+
+from sklearn.impute import SimpleImputer
+
+imputer = SimpleImputer(strategy="median")
+
+# This has only numbers
+housing_num = housing.drop("ocean_proximity", axis=1)
+
+
+# Simply computes - doesn't transform
+imputer.fit(housing_num)
+
+print(imputer.statistics_)
+
+X= imputer.transform(housing_num)
+# This is a numpy array
+
+housing_tr = pd.DataFrame(X, columns=housing_num.columns)
+
+
+
+
+
+
